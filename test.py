@@ -9,7 +9,6 @@ from PIL import Image
 np.set_printoptions(precision=5, suppress=True)
 
 from cl_simple import CLNN_Simple
-from cl_runs import CLNN_Runs
 
 ctx = cl.create_some_context()
 model = [
@@ -51,12 +50,12 @@ model = [
     },
 ]
 
-nn = CLNN_Runs(ctx, model)
+nn = CLNN_Simple(ctx, model)
 
 bw, bh = nn.bw, nn.bh
 blk = np.arange(bw*bh).reshape((bh,bw)).astype(np.float32)
-print blk[:10,:10]
-print
+print(blk[:10,:10])
+print()
 fblk = nn.filter_block(blk)
 
-print fblk[:10,:10]
+print(fblk[:10,:10])

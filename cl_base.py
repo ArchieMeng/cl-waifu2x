@@ -1,7 +1,12 @@
 #!/usr/bin/python
+import os
+
 import numpy as np
 import pyopencl as cl
 import time, json
+
+dirname = os.path.dirname(os.path.realpath(__file__))
+
 
 class CLNN_Base(object):
     FIXED_BLOCKSIZE = False
@@ -12,7 +17,7 @@ class CLNN_Base(object):
         self.total_time = 0
         self.total_pixels = 0
         self.bw, self.bh = 128, 128
-        with open("convolve_many.c", 'r') as fp:
+        with open(os.path.join(dirname, "convolve_many.c"), 'r') as fp:
             self.prg = cl.Program(self.ctx, fp.read()).build()
 
     def load(self, model_file):
