@@ -18,14 +18,20 @@ args = arg_parser.parse_args()
 
 dirname = os.path.dirname(os.path.realpath(__file__))
 infile = args.input
-default_outfile_name = '.'.join(infile.split('.')[:-1]) + '(cl_2x)'
+model_path = args.model_file
+model_name = os.path.basename(model_path)
+default_outfile_name = '.'.join(infile.split('.')[:-1]) + '(' + model_name + ')'
 outfile = args.output or default_outfile_name + '.' + infile.split('.')[-1]
-modelpath = args.model_file
 
-scale = "scale" in modelpath
+scale = "scale" in model_path
 
-ctx = cl.create_some_context(interactive=True)
-nn = CLNN_Simple(ctx, modelpath)
+# ctx = cl.create_some_context(interactive=True)
+ctx = cl.Context(
+    dev_type=cl.device_type.GPU,
+    properties=[(cl.context_properties.PLATFORM, cl.get_platforms()[1])]
+)
+print(ctx)
+nn = CLNN_Simple(ctx, model_path)
 
 im = Image.open(infile).convert("YCbCr")
 
