@@ -26,11 +26,11 @@ outfile = args.output or default_outfile_name + '.' + infile.split('.')[-1]
 
 scale = "scale" in model_path
 
-# ctx = cl.create_some_context(interactive=True)
-ctx = cl.Context(
-    dev_type=cl.device_type.ALL,
-    properties=[(cl.context_properties.PLATFORM, cl.get_platforms()[1])]
-)
+ctx = cl.create_some_context(interactive=True)
+# ctx = cl.Context(
+#     dev_type=cl.device_type.ALL,
+#     properties=[(cl.context_properties.PLATFORM, cl.get_platforms()[1])]
+# )
 print(ctx)
 nn = CLNN_Simple(ctx, model_path)
 

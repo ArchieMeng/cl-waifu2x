@@ -24,7 +24,7 @@ And an OpenCL implementation.
 
 ## Usage
 
-    $ python2 cl-waifu2x.py miku_small.png miku_small_cl.png models/scale2.0x_model.json
+    $ python2 cl-waifu2x.py -i miku_small.png -o miku_small_cl.png -m qmodels/scale2.0x_model.json
     Choose platform:
     [0] <pyopencl.Platform 'Intel(R) OpenCL' at 0x7fa4d7f10110>
     [1] <pyopencl.Platform 'NVIDIA CUDA' at 0x7fa4d8026f80>

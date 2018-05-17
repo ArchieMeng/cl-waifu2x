@@ -16,16 +16,11 @@ __kernel void convolve_many(
             int k_off = z * num_inputs * 9;
             for (int i = 0; i < num_inputs; i++) {
                 int i_off = xy + i*bs;
-                int ki = 9 * i;
-                acc += in[i_off + 0*bx + 0] * k[k_off + ki + 0];
-                acc += in[i_off + 0*bx + 1] * k[k_off + ki + 1];
-                acc += in[i_off + 0*bx + 2] * k[k_off + ki + 2];
-                acc += in[i_off + 1*bx + 0] * k[k_off + ki + 3];
-                acc += in[i_off + 1*bx + 1] * k[k_off + ki + 4];
-                acc += in[i_off + 1*bx + 2] * k[k_off + ki + 5];
-                acc += in[i_off + 2*bx + 0] * k[k_off + ki + 6];
-                acc += in[i_off + 2*bx + 1] * k[k_off + ki + 7];
-                acc += in[i_off+ 2*bx + 2] * k[k_off + ki + 8];
+                
+                k += 9 * i + k_off;
+                for (int channel = 0;channel < 9;channel++) {
+                    acc += in[i_off + (channel / 3) * bx + channel % 3] * k[channel];
+                }
             }
             acc += bias[z];
             out[xy + z*bs] = acc - 0.9 * fmin(acc, 0.f);
