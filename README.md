@@ -14,7 +14,7 @@ Based on [waifu2x by nagadomi](https://github.com/nagadomi/waifu2x).
 
 ## Dependencies
 
-* Python 2.7
+* Python 2.7 or Python3
 * numpy
 * scipy
 * PIL (or Pillow)
