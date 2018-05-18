@@ -14,12 +14,12 @@ __kernel void convolve_many(
 
             float acc = 0;
             int k_off = z * num_inputs * 9;
+            k += k_off;
             for (int i = 0; i < num_inputs; i++) {
                 int i_off = xy + i*bs;
-                
-                k += 9 * i + k_off;
+
                 for (int channel = 0;channel < 9;channel++) {
-                    acc += in[i_off + (channel / 3) * bx + channel % 3] * k[channel];
+                    acc += in[i_off + (channel / 3) * bx + channel % 3] * (*(k++));
                 }
             }
             acc += bias[z];
