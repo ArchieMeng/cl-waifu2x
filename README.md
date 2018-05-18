@@ -23,8 +23,20 @@ Based on [waifu2x by nagadomi](https://github.com/nagadomi/waifu2x).
 And an OpenCL implementation.
 
 ## Usage
+    $ python3 cl-waifu2x.py --help
+    usage: cl-waifu2x.py [-h] [--input INPUT] [--output OUTPUT]
+                         [--model_file MODEL_FILE [MODEL_FILE ...]]
 
-    $ python2 cl-waifu2x.py -i miku_small.png -o miku_small_cl.png -m qmodels/scale2.0x_model.json
+    optional arguments:
+      -h, --help            show this help message and exit
+      --input INPUT, -i INPUT
+      --output OUTPUT, -o OUTPUT
+      --model_file MODEL_FILE [MODEL_FILE ...], -m MODEL_FILE [MODEL_FILE ...]
+
+    You can use many models to operate the image, by this way, you can scale the images first and then decrease noise by
+    given parameters like "-m models/scale2.0x_model.json models/noise1_model.json"
+
+    $ python3 cl-waifu2x.py -i miku_small.png -o miku_small_cl.png -m qmodels/scale2.0x_model.json
     Choose platform:
     [0] <pyopencl.Platform 'Intel(R) OpenCL' at 0x7fa4d7f10110>
     [1] <pyopencl.Platform 'NVIDIA CUDA' at 0x7fa4d8026f80>
