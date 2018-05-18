@@ -13,18 +13,31 @@ from cl_simple import CLNN_Simple
 import argparse
 
 arg_parser = argparse.ArgumentParser()
-arg_parser.add_argument('--input', '-i', default='sample.jpg')
-arg_parser.add_argument('--output', '-o', default=None)
-arg_parser.add_argument('--model_file', '-m', default=os.path.join(dirname, 'models/scale2.0x_model.json'))
+arg_parser.add_argument(
+    '--input',
+    '-i',
+    default='sample.jpg'
+)
+arg_parser.add_argument(
+    '--output',
+    '-o',
+    default=None
+)
+# Todo change model file to a nargs.In order to support multi operations
+arg_parser.add_argument(
+    '--model_file',
+    '-m',
+    nargs='+',
+    type=str,
+    default=[os.path.join(dirname, 'models/scale2.0x_model.json')]
+)
 args = arg_parser.parse_args()
 
 infile = args.input
-model_path = args.model_file
-model_name = os.path.basename(model_path)
-default_outfile_name = '.'.join(infile.split('.')[:-1]) + '(' + model_name + ')'
+model_paths = args.model_file
+model_names = [os.path.basename(model_path) for model_path in model_paths]
+default_outfile_name = '.'.join(infile.split('.')[:-1]) + '(' + '+'.join(model_names) + ')'
 outfile = args.output or default_outfile_name + '.' + infile.split('.')[-1]
-
-scale = "scale" in model_path
 
 ctx = cl.create_some_context(interactive=True)
 # ctx = cl.Context(
@@ -32,29 +45,33 @@ ctx = cl.create_some_context(interactive=True)
 #     properties=[(cl.context_properties.PLATFORM, cl.get_platforms()[1])]
 # )
 print(ctx)
-nn = CLNN_Simple(ctx, model_path)
 
 im = Image.open(infile).convert("YCbCr")
+for model_path in model_paths:
+    nn = CLNN_Simple(ctx, model_path)
 
-if scale:
-    im = im.resize((2*im.size[0], 2*im.size[1]), resample=Image.BICUBIC)
+    scale = "scale" in model_path
 
-im = misc.fromimage(im)
-luma = im[:,:,0]
-#misc.toimage(luma, mode="L").save("luma_"+outfile)
+    if scale:
+        im = im.resize((2*im.size[0], 2*im.size[1]), resample=Image.BICUBIC)
 
-in_plane = np.clip(luma.astype("float32") / 255.0, 0, 1)
+    im = misc.fromimage(im)
+    luma = im[:,:,0]
+    #misc.toimage(luma, mode="L").save("luma_"+outfile)
+
+    in_plane = np.clip(luma.astype("float32") / 255.0, 0, 1)
 
 
-def progress(frac):
-    sys.stderr.write("\r%.1f%%..." % (100 * frac))
-o_np = nn.filter_image(in_plane, progress)
-sys.stderr.write("Done\n")
-sys.stderr.write("%d pixels/sec\n" % nn.pixels_per_second)
-sys.stderr.write("%f Gflops/sec\n" % (nn.ops_per_second / (10. ** 9)))
+    def progress(frac):
+        sys.stderr.write("\r%.1f%%..." % (100 * frac))
+    o_np = nn.filter_image(in_plane, progress)
+    sys.stderr.write("Done\n")
+    sys.stderr.write("%d pixels/sec\n" % nn.pixels_per_second)
+    sys.stderr.write("%f Gflops/sec\n" % (nn.ops_per_second / (10. ** 9)))
 
-luma = (np.clip(np.nan_to_num(o_np), 0, 1) * 255).astype("uint8")
-#misc.toimage(luma, mode="L").save("luma_o_"+outfile)
-im[:,:,0] = luma
-misc.toimage(im, mode="YCbCr").convert("RGB").save(outfile)
+    luma = (np.clip(np.nan_to_num(o_np), 0, 1) * 255).astype("uint8")
+    #misc.toimage(luma, mode="L").save("luma_o_"+outfile)
+    im[:,:,0] = luma
+    im = misc.toimage(im, mode="YCbCr")
+im.convert('RGB').save(outfile)
 

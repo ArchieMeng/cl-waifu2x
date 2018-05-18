@@ -29,14 +29,16 @@ And an OpenCL implementation.
     [0] <pyopencl.Platform 'Intel(R) OpenCL' at 0x7fa4d7f10110>
     [1] <pyopencl.Platform 'NVIDIA CUDA' at 0x7fa4d8026f80>
     Choice [0]:
-    Set the environment variable PYOPENCL_CTX='' to avoid being asked again.
+    Set the environment variable PYOPENCL_CTX='0' to avoid being asked again.
     100.0%...Done
-    29004 pixels/sec
-    925359122 ops/sec
+    39918 pixels/sec
+    3.820713 Gflops/sec
 
 OpenCL implementations that are being used for testing:
 * Intel (CPU) (test platform: Intel Core i7 3820QM)
 * Nvidia (GPU) (test platform: Nvidia GeForce GTX 660M)
+* Intel (CPU) (test platform: Intel Core i7 7500u)
+* Intel (GPU) (test platform: Intel(R) HD Graphics 620)
 
 ## Performance
 
@@ -46,3 +48,4 @@ waifu2x CUDA version on the same GPU, though also several times faster than
 the trivial
 [single-threaded waifu2x.py](tools/waifu2x.py)
 on the same CPU.
+(PS: on Intel 7-th gen platform, GPU is somehow 12.5% slower than CPU.)
