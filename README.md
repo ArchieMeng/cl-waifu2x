@@ -33,10 +33,10 @@ And an OpenCL implementation.
       --output OUTPUT, -o OUTPUT
       --model_file MODEL_FILE [MODEL_FILE ...], -m MODEL_FILE [MODEL_FILE ...]
 
-    You can use many models to operate the image, by this way, you can scale the images first and then decrease noise by
-    given parameters like "-m models/scale2.0x_model.json models/noise1_model.json"
+You can use many models to operate the image, by this way, you can scale the images first and then decrease noise by
+given parameters like "-m models/scale2.0x_model.json models/noise1_model.json"
 
-    $ python3 cl-waifu2x.py -i miku_small.png -o miku_small_cl.png -m qmodels/scale2.0x_model.json
+    $ python3 cl-waifu2x.py -i miku_small.png -o miku_small_cl.png -m models/scale2.0x_model.json
     Choose platform:
     [0] <pyopencl.Platform 'Intel(R) OpenCL' at 0x7fa4d7f10110>
     [1] <pyopencl.Platform 'NVIDIA CUDA' at 0x7fa4d8026f80>
