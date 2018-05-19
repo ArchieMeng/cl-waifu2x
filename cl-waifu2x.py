@@ -13,6 +13,7 @@ from cl_simple import CLNN_Simple
 import argparse
 
 arg_parser = argparse.ArgumentParser()
+default_model = os.path.join(dirname, 'models/scale2.0x_model.json')
 arg_parser.add_argument(
     '--input',
     '-i',
@@ -23,13 +24,21 @@ arg_parser.add_argument(
     '-o',
     default=None
 )
-# Todo change model file to a nargs.In order to support multi operations
 arg_parser.add_argument(
     '--model_file',
     '-m',
     nargs='+',
     type=str,
-    default=[os.path.join(dirname, 'models/scale2.0x_model.json')]
+    default=[default_model]
+)
+arg_parser.add_argument(
+    '--resize',
+    '-r',
+    nargs='+',
+    type=int,
+    default=[],
+    metavar="height [width]",
+    help="""set output image size to (height * width)"""
 )
 args = arg_parser.parse_args()
 
@@ -47,12 +56,18 @@ ctx = cl.create_some_context(interactive=True)
 print(ctx)
 
 im = Image.open(infile).convert("YCbCr")
+need_resize = args.resize and len(args.resize) <= 2
+if need_resize:
+    if len(args.resize) == 1:
+        args.resize.append(int(im.size[1] * float(args.resize[0]) / im.size[0]))
+    im = im.resize((args.resize[0], args.resize[1]), resample=Image.BICUBIC)
 for model_path in model_paths:
     nn = CLNN_Simple(ctx, model_path)
 
     scale = "scale" in model_path
 
-    if scale:
+    # need resize
+    if (not need_resize) and scale:
         im = im.resize((2*im.size[0], 2*im.size[1]), resample=Image.BICUBIC)
 
     im = misc.fromimage(im)
@@ -70,8 +85,9 @@ for model_path in model_paths:
     sys.stderr.write("%f Gflops/sec\n" % (nn.ops_per_second / (10. ** 9)))
 
     luma = (np.clip(np.nan_to_num(o_np), 0, 1) * 255).astype("uint8")
-    #misc.toimage(luma, mode="L").save("luma_o_"+outfile)
+    # misc.toimage(luma, mode="L").save("luma_o_"+outfile)
     im[:,:,0] = luma
     im = misc.toimage(im, mode="YCbCr")
 im.convert('RGB').save(outfile)
+print("output to:", outfile)
 

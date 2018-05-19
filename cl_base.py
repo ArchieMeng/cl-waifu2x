@@ -67,7 +67,7 @@ class CLNN_Base(object):
 
         self.total_time += time.time() - t
         self.total_pixels += (bw-pad) * (bh-pad)
-        return o_np[0:bh-pad,0:bw-pad]
+        return o_np[0:bh-pad, 0:bw-pad]
 
     def filter_image(self, im, progress_cb=None):
         pad = self.pad
