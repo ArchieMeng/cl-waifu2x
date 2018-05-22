@@ -50,17 +50,16 @@ outfile = args.output or default_outfile_name + '.' + infile.split('.')[-1]
 
 ctx = cl.create_some_context(interactive=True)
 # ctx = cl.Context(
-#     dev_type=cl.device_type.ALL,
+#     devices=[cl.get_platforms()[1].get_devices()[0], cl.get_platforms()[1].get_devices()[1]],
 #     properties=[(cl.context_properties.PLATFORM, cl.get_platforms()[1])]
 # )
 print(ctx)
 
-im = Image.open(infile).convert("YCbCr")
+im = CLNN_Simple.load_image(infile)
 need_resize = args.resize and len(args.resize) <= 2
 if need_resize:
-    if len(args.resize) == 1:
-        args.resize.append(int(im.size[1] * float(args.resize[0]) / im.size[0]))
-    im = im.resize((args.resize[0], args.resize[1]), resample=Image.BICUBIC)
+    im = CLNN_Simple.resize_image(im, args.resize)
+
 for model_path in model_paths:
     nn = CLNN_Simple(ctx, model_path)
 
@@ -70,24 +69,16 @@ for model_path in model_paths:
     if (not need_resize) and scale:
         im = im.resize((2*im.size[0], 2*im.size[1]), resample=Image.BICUBIC)
 
-    im = misc.fromimage(im)
-    luma = im[:,:,0]
-    #misc.toimage(luma, mode="L").save("luma_"+outfile)
-
-    in_plane = np.clip(luma.astype("float32") / 255.0, 0, 1)
 
 
     def progress(frac):
         sys.stderr.write("\r%.1f%%..." % (100 * frac))
-    o_np = nn.filter_image(in_plane, progress)
+    im = nn.process_image(im, progress)
     sys.stderr.write("Done\n")
     sys.stderr.write("%d pixels/sec\n" % nn.pixels_per_second)
     sys.stderr.write("%f Gflops/sec\n" % (nn.ops_per_second / (10. ** 9)))
-
-    luma = (np.clip(np.nan_to_num(o_np), 0, 1) * 255).astype("uint8")
     # misc.toimage(luma, mode="L").save("luma_o_"+outfile)
-    im[:,:,0] = luma
-    im = misc.toimage(im, mode="YCbCr")
+
 im.convert('RGB').save(outfile)
 print("output to:", outfile)
 
