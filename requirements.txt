@@ -1,0 +1,9 @@
+appdirs==1.4.3
+decorator==4.3.0
+numpy==1.15.1
+Pillow==5.2.0
+pybind11==2.2.4
+pyopencl==2018.2
+pytools==2018.5.2
+scipy==1.1.0
+six==1.11.0
