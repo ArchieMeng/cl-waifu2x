@@ -15,9 +15,12 @@ class CLNN_Simple(CLNN_Base):
     def resize_image(im, shape):
         if isinstance(shape, (list, tuple)) and len(shape) == 2:
             return im.resize((shape[0], shape[1]), resample=Image.BICUBIC)
-        elif isinstance(shape, (float, int)):
-            height = int(im.size[1] * float(shape) / im.size[0])
-            return im.resize((shape, height), resample=Image.BICUBIC)
+        else:
+            if isinstance(shape, (list, tuple)):
+                shape = shape[0]
+            if isinstance(shape, (float, int)):
+                height = int(im.size[1] * float(shape) / im.size[0])
+                return im.resize((shape, height), resample=Image.BICUBIC)
 
     def process_image(self, im, process_callback=None):
         im = misc.fromimage(im)
